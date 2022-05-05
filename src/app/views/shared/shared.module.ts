@@ -14,8 +14,9 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { ButtonModule } from 'primeng/button';
-import {CalendarModule} from 'primeng/calendar';
-import {TabViewModule} from 'primeng/tabview';
+import { CalendarModule } from 'primeng/calendar';
+import { TabViewModule } from 'primeng/tabview';
+import { ToastrModule, ToastContainerModule } from 'ngx-toastr';
 
 import { SharedRoutingModule } from "../shared/shared-routing.module";
 import { KodEditComponent } from './pages/kod/kod-edit/kod-edit.component';
@@ -120,7 +121,9 @@ import { ValueRendererComponent } from './pages/kod/value-renderer/value-rendere
     MatCardModule,
     ButtonModule,
     CalendarModule,
-    TabViewModule
+    TabViewModule,
+    ToastrModule.forRoot(),
+    ToastContainerModule,
   ],
   exports: [
   ]

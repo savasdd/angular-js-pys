@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import request from 'axios';
 import { PYS_URL, GridDef, overlayNoRows } from "../../../service/pys.url"
 import { PysService } from "../../../service/pys.service";
-import { Cookie } from 'ng2-cookies/ng2-cookies';
+import { ToastType } from "../../../model/ToastType";
 
 @Component({
   selector: 'app-parametre-list',
@@ -36,7 +36,7 @@ export class ParametreListComponent implements OnInit {
   }
 
   test(): void {
-    console.log(Cookie.get('tkn'))
+    this.service.showToast(ToastType.warning, "Uyarı", "Test");
   }
 
 }

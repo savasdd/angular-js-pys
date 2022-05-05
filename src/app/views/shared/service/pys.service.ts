@@ -5,7 +5,10 @@ import request from "axios";
 import { Router } from '@angular/router';
 import { PYS_URL } from "../service/pys.url";
 import { CustomCombo } from "../model/CustomCombo";
+import { ToastType } from "../model/ToastType";
 import { Cookie } from 'ng2-cookies/ng2-cookies';
+import { ToastrService } from 'ngx-toastr';
+
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +16,7 @@ import { Cookie } from 'ng2-cookies/ng2-cookies';
 export class PysService implements OnInit {
   header: HttpHeaders;
 
-  constructor(private router: Router, private http: HttpClient) { }
+  constructor(private router: Router, private http: HttpClient, public toastr: ToastrService) { }
 
   ngOnInit(): void {
   }
@@ -49,6 +52,8 @@ export class PysService implements OnInit {
     resp.then(val => {
       if (val)
         this.router.navigate(['/dashboard']);
+      else
+        this.showToast(ToastType.warning, "Uyarı", "Kullanıcı bulunamadı!");
     });
   }
 
@@ -59,6 +64,7 @@ export class PysService implements OnInit {
     console.log("Logout!")
   }
 
+
   getHeader(): HttpHeaders {
     this.header = new HttpHeaders({
       'Content-Type': 'application/json; charset=utf-8',
@@ -66,6 +72,7 @@ export class PysService implements OnInit {
     })
     return this.header;
   }
+
 
   getList(url: string, params: HttpParams): Observable<Object[]> {
     return this.http.get<Object[]>(url, { headers: this.getHeader(), params });
@@ -157,7 +164,7 @@ export class PysService implements OnInit {
   };
 
   getUniversite(url: string): Array<CustomCombo> {
-    let universiteList: Array<CustomCombo> = [];
+    let dataList: Array<CustomCombo> = [];
     let resp = request({
       url: url,
       method: 'GET',
@@ -169,12 +176,119 @@ export class PysService implements OnInit {
         let user = new CustomCombo();
         user.name = dt.universiteAd;
         user.value = dt.universiteKod;
-        universiteList.push(user);
+        dataList.push(user);
       });
     });
 
-    return universiteList;
+    return dataList;
+  };
+
+  getKod(url: string): Array<CustomCombo> {
+    let dataList: Array<CustomCombo> = [];
+    let resp = request({
+      url: url,
+      method: 'GET',
+      headers: PYS_URL.HEADER,
+    });
+
+    resp.then(val => {
+      val.data.map((dt) => {
+        let user = new CustomCombo();
+        user.name = dt.tanim;
+        user.value = dt.kodId;
+        dataList.push(user);
+      });
+    });
+
+    return dataList;
+  };
+
+  getWebKod(url: string): Array<CustomCombo> {
+    let dataList: Array<CustomCombo> = [];
+    let resp = request({
+      url: url,
+      method: 'GET',
+      headers: PYS_URL.HEADER,
+    });
+
+    resp.then(val => {
+      val.data.map((dt) => {
+        let user = new CustomCombo();
+        user.name = dt.tanim;
+        user.value = dt.kod;
+        dataList.push(user);
+      });
+    });
+
+    return dataList;
+  };
+
+  RAPOR(URL: string, raporTuru: string, ekran: string, raporAdi: string, dto: object) {
+    let resp = request({
+      url: URL,
+      method: 'POST',
+      headers: PYS_URL.HEADER,
+      responseType: 'blob',
+      params: { 'raporTuru': raporTuru, 'ekran': ekran, 'raporAdi': raporAdi },
+      data: dto
+    });
+
+    resp.then(val => {
+      if (raporTuru == 'PDF') {
+        this.exportPDF(val.data, raporAdi);
+      } else if (raporTuru == 'WORD') {
+        this.exportDOCX(val.data, raporAdi);
+      } else if (raporTuru == 'EXCEL') {
+        this.exportXLSX(val.data, raporAdi);
+      }
+    });
+  };
+
+  exportPDF(data: BlobPart, name: string) {
+    const url = window.URL.createObjectURL(new Blob([data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute("download", name + ".pdf");
+    document.body.appendChild(link);
+    link.click();
+  };
+
+  exportDOCX(data: BlobPart, name: string) {
+    const url = window.URL.createObjectURL(new Blob([data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute("download", name + ".docx");
+    document.body.appendChild(link);
+    link.click();
+  };
+
+
+  exportXLSX(data: BlobPart, name: string) {
+    const url = window.URL.createObjectURL(new Blob([data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute("download", name + ".xlsx");
+    document.body.appendChild(link);
+    link.click();
+  };
+
+
+
+  showToast(type: ToastType, header: string, message: string) {
+    switch (type) {
+      case 0:
+        this.toastr.info(message, header);
+        break;
+      case 1:
+        this.toastr.error(message, header);
+        break;
+      case 2:
+        this.toastr.warning(message, header);
+        break;
+      case 3:
+        this.toastr.success(message, header);
+        break;
+    }
   };
 
 }
-

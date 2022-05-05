@@ -55,6 +55,7 @@
     "ng2-cookies": "^1.0.12",
     "ngx-bootstrap": "^6.2.0",
     "ngx-perfect-scrollbar": "^10.1.1",
+    "ngx-toastr": "^14.3.0",
     "primeicons": "^5.0.0",
     "primeng": "^13.3.2",
     "rxjs": "^6.6.7",
